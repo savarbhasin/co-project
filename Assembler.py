@@ -1,6 +1,5 @@
-Midam  = ["xor", "and", "or", "sll", "srl"]
+Midam  = ["xor", "and", "or", "sll", "srl", "and", "sub", "stlu", "stl"]
 
-# Open the input text file in read mode
 with open('input.txt', 'r') as file:
     line_no = 0
     # Read each line from the file
@@ -37,13 +36,21 @@ R_type = {
 #Midam Wala Part Starts:
 def midam_r(command, line_no):
     #Error handling Start
-    if(command[0]!= "xor" or command[0]!= "sll" or command[0]!= "srl" or command[0]!= "or" or command[0]!= "and"):
+    if(command[0]!= "xor" or command[0]!= "sll" or command[0]!= "srl" or command[0]!= "or" or command[0]!= "and" or command[0]!= "add" or command[0]!= "sub" or command[0]!= "slt" or command[0]!= "stlu"):
         return (f"Wrong Function Call: Function Called - Midam_R at line {line_no}")
     
     if(len(command)!=4 or ((len(command[1])!=3) or (len(command[2])!=3) or (len(command[3])!=3))):
         return (f"Invalid input at line {line_no}")
     #Error Handling End. Now Assembly -> Binary starts
 
+    if(command[0]==add):
+        return(f"{R_type["add"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["add"][1]} {Registers[str(command[1])]} {R_type["add"][-1]} ")
+
+    if(command[0]==slt):
+        return(f"{R_type["slt"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["slt"][1]} {Registers[str(command[1])]} {R_type["slt"][-1]} ")
+    
+    if(command[0]==sltu):
+        return(f"{R_type["sltu"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sltu"][1]} {Registers[str(command[1])]} {R_type["sltu"][-1]} ")
 
     if(command[0]==xor):
         return(f"{R_type["xor"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["xor"][1]} {Registers[str(command[1])]} {R_type["xor"][-1]} ")
@@ -59,3 +66,9 @@ def midam_r(command, line_no):
 
     if(command[0]==and):
         return(f"{R_type["and"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["and"][1]} {Registers[str(command[1])]} {R_type["and"][-1]} ")
+
+    if(command[0] = "sub"):
+        if(len(command[2]) == 3):
+            return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
+        a = int(str(command[2][1::]))
+        return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {format(a, '04b')} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
