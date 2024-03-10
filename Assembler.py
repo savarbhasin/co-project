@@ -43,31 +43,31 @@ def midam_r(command, line_no):
         return (f"Invalid input at line {line_no}")
     #Error Handling End. Now Assembly -> Binary starts
 
-    if(command[0]==add):
+    if(command[0]=='add'):
         return(f"{R_type["add"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["add"][1]} {Registers[str(command[1])]} {R_type["add"][-1]} ")
 
-    if(command[0]==slt):
+    if(command[0]=='slt'):
         return(f"{R_type["slt"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["slt"][1]} {Registers[str(command[1])]} {R_type["slt"][-1]} ")
     
-    if(command[0]==sltu):
+    if(command[0]=='sltu'):
         return(f"{R_type["sltu"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sltu"][1]} {Registers[str(command[1])]} {R_type["sltu"][-1]} ")
 
-    if(command[0]==xor):
+    if(command[0]=='xor'):
         return(f"{R_type["xor"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["xor"][1]} {Registers[str(command[1])]} {R_type["xor"][-1]} ")
 
-    if(command[0]==sll):
+    if(command[0]=='sll'):
         return(f"{R_type["sll"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sll"][1]} {Registers[str(command[1])]} {R_type["sll"][-1]} ")
 
-    if(command[0]==srl):
+    if(command[0]=='srl'):
         return(f"{R_type["srl"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["srl"][1]} {Registers[str(command[1])]} {R_type["srl"][-1]} ")
 
-    if(command[0]==or):
+    if(command[0]=='or'):
         return(f"{R_type["or"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["or"][1]} {Registers[str(command[1])]} {R_type["or"][-1]} ")
 
-    if(command[0]==and):
+    if(command[0]=='and'):
         return(f"{R_type["and"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["and"][1]} {Registers[str(command[1])]} {R_type["and"][-1]} ")
 
-    if(command[0] = "sub"):
+    if(command[0] == "sub"):
         if(len(command[2]) == 3):
             return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
         a = int(str(command[2][1::]))
