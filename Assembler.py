@@ -1,15 +1,6 @@
 Midam  = ["xor", "and", "or", "sll", "srl", "and", "sub", "stlu", "stl"]
 
-with open('input.txt', 'r') as file:
-    line_no = 0
-    # Read each line from the file
-    for line in file:
-        line_no = line_no +1
-        # Remove commas from the line and store it in the "command" list
-        command = list(line.strip().replace(',', ''))
-        if(command[0] in Midam):
-            print(midam_r)
-            continue
+
 
 
 #The above part, stores a single line of the input text file in a list, nammed command, every following program will run from the inputs in command.
@@ -72,3 +63,16 @@ def midam_r(command, line_no):
             return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
         a = int(str(command[2][1::]))
         return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {format(a, '04b')} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
+    
+
+
+with open('input.txt', 'r') as file:
+    line_no = 0
+    # Read each line from the file
+    for line in file:
+        line_no = line_no +1
+        # Remove commas from the line and store it in the "command" list
+        command = list(line.strip().replace(',', ''))
+        if(command[0] in Midam):
+            print(midam_r)
+            continue
