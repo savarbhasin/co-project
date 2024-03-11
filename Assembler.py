@@ -195,6 +195,7 @@ with open('input.txt', 'r') as file, open('output.txt','w') as output:
     line_no = 0
     for line in file:
         line_no = line_no +1
+        
         parts = line.split()
         command = [parts[0]] + parts[1].replace(',', ' ').split(' ') 
         present = False
