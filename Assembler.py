@@ -194,11 +194,10 @@ def savar_b(command,line_no):
         funct3,opcode = B_Type[command[0]]
         rs1,rs2 = Registers[command[1]], Registers[command[2]]
         
-        if(command[-1] in Registers):
-            y = twos_complement(Registers[command[-1]])
-        else:
-            y = twos_complement(int(command[-1]),32)
-            x=y[::-1]
+        
+        
+        y = twos_complement(int(command[-1]),32)
+        x=y[::-1]
 
         if(int(command[-1])!=binary(y)):
             return f"Overflow error at {line_no}"
