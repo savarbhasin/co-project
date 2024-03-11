@@ -1,6 +1,6 @@
 #The above part, stores a single line of the input text file in a list, nammed command, every following program will run from the inputs in command.
 # Registers = {'rs' + str(i): format(i, '05b') for i in range(16)}    #Binary code for every register rs0-rs15, where rs0 = 0000 and rs15 = 1111  
-
+import sys
 Registers = {
   "zero": "00000",
   "ra": "00001",
@@ -212,7 +212,10 @@ def savar_j(command):
         return "Overflow error" 
     return f"{x[20]}{x[1:11][::-1]}{x[11]}{x[12:20][::-1]}{rd}1101111"
 
-with open('input.txt', 'r') as file, open('output.txt','w') as output:
+
+file_path = sys.argv[1]
+output_path = sys.argv[2]
+with open(file_path, 'r') as file, open(output_path,'w') as output:
     line_no = 0
     x = file.readlines()
     file.seek(0)
