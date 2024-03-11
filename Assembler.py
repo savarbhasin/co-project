@@ -120,6 +120,21 @@ def twos_complement(number, bit_length):
 
 
 
+
+# def binary(num):
+#     fin = 0
+#     for i in range(len(str(num))-1,0,-1):
+    
+#         fin+=int(num[i])*(2**i)
+#     return fin
+def binary(binary):
+    if binary[0] == '0':
+        return int(binary, 2)
+    else:
+        inverted_binary = ''.join('1' if bit == '0' else '0' for bit in binary)
+        decimal = -int(inverted_binary, 2) - 1
+        return decimal
+
 def midam_r(command, line_no):
 
     funct7,funct3,opcode = R_type[command[0]]
@@ -141,9 +156,6 @@ def savar_i(command, line_no):
         x=command[-1].split('(')
         rs1 = Registers[command[-1].split('(')[1][:-1]]
         x = twos_complement(int(x[0]),12)
-        
-
-
     
     if(command[0] == 'addi' or command[0] == 'sltiu'):
         x = twos_complement(int(command[-1]),12)
@@ -152,7 +164,10 @@ def savar_i(command, line_no):
     if(command[0] == 'jalr'):
         x = twos_complement(int(command[-1]),12)
         rs1 = '0110'
+    
 
+    if(int(command[-1].split('(')[0]) != binary(x)):
+        return f"Overflow error"
     return f"{x}{rs1}{funct3}{rd}{opcode}"
     
 def savar_s(command,line_no):
@@ -170,16 +185,20 @@ def savar_b(command):
     funct3,opcode = B_Type[command[0]]
     rs1,rs2 = Registers[command[1]], Registers[command[2]]
     
-    x = twos_complement(int(command[-1]),32)
-    x=x[::-1]
+    y = twos_complement(int(command[-1]),32)
+    x=y[::-1]
 
+    if(int(command[-1])!=binary(y)):
+        return f"Overflow error"
 
     return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
 
 def savar_u(command):
-    x = twos_complement(int(command[-1]),32)
+    y = twos_complement(int(command[-1]),32)
     rd = Registers[command[1]]
-    x=x[::-1]
+    x=y[::-1]
+    if(int(command[-1])!=binary(y)):
+        return "Overflow error"
     if(command[0] == 'lui'):
         return f"{x[12:][::-1]}{rd}0110111"
     if(command[0] == 'auipc'):
@@ -187,20 +206,28 @@ def savar_u(command):
 
 def savar_j(command):
     rd = Registers[command[1]]
-    x = twos_complement(int(command[-1]),32)
-    x = x[::-1]
+    y = twos_complement(int(command[-1]),21)
+    x = y[::-1]
+    if(int(command[-1])!=binary(y)):
+        return "Overflow error" 
     return f"{x[20]}{x[1:11][::-1]}{x[11]}{x[12:20][::-1]}{rd}1101111"
 
 with open('input.txt', 'r') as file, open('output.txt','w') as output:
     line_no = 0
+    x = file.readlines()
+    file.seek(0)
+    present = False
     for line in file:
         line_no = line_no +1
         
         parts = line.split()
         command = [parts[0]] + parts[1].replace(',', ' ').split(' ') 
-        present = False
-        if(command[0] == 'halt'):
+        
+        
+                
+        if(command == ['beq','zero','zero','0']):
             present = True
+            output.write(savar_b(command) + '\n')
             break
         if(command[0] in R_type):
             output.write(midam_r(command,line_no) + '\n')
@@ -216,6 +243,11 @@ with open('input.txt', 'r') as file, open('output.txt','w') as output:
             output.write(savar_j(command) + '\n')
         else:
             output.write("Invalid input at line " + str(line) + '\n')
+        if(line_no == len(x)):
+            if(command != ['beq','zero','zero','0']):
+                output.write("Virtual halt not present as last command" + '\n')
+                present=True
+                break
     if(present == False):
         output.write("Virtual halt not present")
         
