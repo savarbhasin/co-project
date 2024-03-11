@@ -67,45 +67,6 @@ B_Type = {
     'bgeu':['111','1100011']
 }
 
-#Midam Wala Part Starts:
-# def midam_r(command, line_no):
-#     #Error handling Start
-#     if(command[0]!= "xor" or command[0]!= "sll" or command[0]!= "srl" or command[0]!= "or" or command[0]!= "and" or command[0]!= "add" or command[0]!= "sub" or command[0]!= "slt" or command[0]!= "stlu"):
-#         return (f"Wrong Function Call: Function Called - Midam_R at line {line_no}")
-    
-#     if(len(command)!=4 or ((len(command[1])!=3) or (len(command[2])!=3) or (len(command[3])!=3))):
-#         return (f"Invalid input at line {line_no}")
-#     #Error Handling End. Now Assembly -> Binary starts
-
-#     if(command[0]=='add'):
-#         return(f"{R_type["add"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["add"][1]} {Registers[str(command[1])]} {R_type["add"][-1]} ")
-
-#     if(command[0]=='slt'):
-#         return(f"{R_type["slt"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["slt"][1]} {Registers[str(command[1])]} {R_type["slt"][-1]} ")
-    
-#     if(command[0]=='sltu'):
-#         return(f"{R_type["sltu"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sltu"][1]} {Registers[str(command[1])]} {R_type["sltu"][-1]} ")
-
-#     if(command[0]=='xor'):
-#         return(f"{R_type["xor"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["xor"][1]} {Registers[str(command[1])]} {R_type["xor"][-1]} ")
-
-#     if(command[0]=='sll'):
-#         return(f"{R_type["sll"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sll"][1]} {Registers[str(command[1])]} {R_type["sll"][-1]} ")
-
-#     if(command[0]=='srl'):
-#         return(f"{R_type["srl"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["srl"][1]} {Registers[str(command[1])]} {R_type["srl"][-1]} ")
-
-#     if(command[0]=='or'):
-#         return(f"{R_type["or"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["or"][1]} {Registers[str(command[1])]} {R_type["or"][-1]} ")
-
-#     if(command[0]=='and'):
-#         return(f"{R_type["and"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["and"][1]} {Registers[str(command[1])]} {R_type["and"][-1]} ")
-
-#     if(command[0] == "sub"):
-#         if(len(command[2]) == 3):
-#             return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {Registers[str(command[-2])]} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
-#         a = int(str(command[2][1::]))
-#         return(f"{R_type["sub"][0]} {Registers[str(command[-1])]} {format(a, '04b')} {R_type["sub"][1]} {Registers[str(command[1])]} {R_type["sub"][-1]} ")
 
 def twos_complement(number, bit_length):
     if number >= 0:
@@ -121,12 +82,6 @@ def twos_complement(number, bit_length):
 
 
 
-# def binary(num):
-#     fin = 0
-#     for i in range(len(str(num))-1,0,-1):
-    
-#         fin+=int(num[i])*(2**i)
-#     return fin
 def binary(binary):
     if binary[0] == '0':
         return int(binary, 2)
@@ -143,7 +98,7 @@ def midam_r(command, line_no):
         
         return f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
     except:
-        return  f"Incorrect syntax at {line_no}"
+        return "Incorrect syntax"
 
 def savar_i(command, line_no):
     try:
@@ -169,10 +124,10 @@ def savar_i(command, line_no):
         
 
         if(int(command[-1].split('(')[0]) != binary(x)):
-            return f"Overflow error at {line_no}"
+            return f"Overflow error"
         return f"{x}{rs1}{funct3}{rd}{opcode}"
     except:
-        return f"Incorrect syntax at {line_no}"
+        return "Incorrect syntax"
     
 def savar_s(command,line_no):
     try:
@@ -184,59 +139,79 @@ def savar_s(command,line_no):
         y = twos_complement(int(x[0]),12)
         x=y[::-1]
         if(binary(y) != int(command[-1].split('(')[0])):
-            return f"Overflow error at {line_no}"
+            return "Overflow error"
         return f"{x[5:][::-1]}{rs2}{rs1}010{x[:5][::-1]}0100011"
     except:
-        return f"Incorrect syntax {line_no}"
+        return "Incorrect syntax"
        
-def savar_b(command,line_no):
+def savar_b(command):
     try:
         funct3,opcode = B_Type[command[0]]
         rs1,rs2 = Registers[command[1]], Registers[command[2]]
-        
-        
         
         y = twos_complement(int(command[-1]),32)
         x=y[::-1]
 
         if(int(command[-1])!=binary(y)):
-            return f"Overflow error at {line_no}"
+            return f"Overflow error"
 
         return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
     except:
-        return f"Incorrect syntax at {line_no}"
+        return "Error" + command[0]
 
-def savar_u(command,line_no):
+
+def savar_u(command):
     try:
         y = twos_complement(int(command[-1]),32)
         rd = Registers[command[1]]
         x=y[::-1]
         if(int(command[-1])!=binary(y)):
-            return f"Overflow error at {line_no}"
+            return "Overflow error"
         if(command[0] == 'lui'):
             return f"{x[12:][::-1]}{rd}0110111"
         if(command[0] == 'auipc'):
             return f"{x[12:][::-1]}{rd}0010111"
     except:
-        return f"Incorrect Syntax at {line_no}"
+        return "Incorrect Syntax"
 
-def savar_j(command,line_no):
+def savar_j(command):
     try:
         rd = Registers[command[1]]
         y = twos_complement(int(command[-1]),21)
         x = y[::-1]
         if(int(command[-1])!=binary(y)):
-            return f"Overflow error at {line_no}" 
+            return "Overflow error" 
         return f"{x[20]}{x[1:11][::-1]}{x[11]}{x[12:20][::-1]}{rd}1101111"
     except:
-        return f"Incorrect syntax at {line_no}"
+        return "Incorrect syntax"
+    
+def midam_label_2(command, line_no, intial_label_no, intial_label):
+    imm_dec  = line_no - intial_label_no
 
 
+    funct3,opcode = B_Type[command[0]]
+    rs1,rs2 = Registers[command[1]], Registers[command[2]]
+        
+    y = twos_complement(imm_dec,32)
+    x=y[::-1]
 
+
+    return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
 
 file_path = sys.argv[1]
 output_path = sys.argv[2]
 
+with open(file_path, 'r') as file:
+    line_no = 0
+    x = file.readlines()
+    file.seek(0)
+    present = False
+    label = {"d;asfh": "dalsjk"}
+    for line in file:
+        line_no = line_no +1
+        parts = line.split()
+        if(parts[0][-1] == ":"):
+            label = {parts[0][:-1:] : line_no}
 
 
 with open(file_path, 'r') as file, open(output_path,'w') as output:
@@ -244,18 +219,41 @@ with open(file_path, 'r') as file, open(output_path,'w') as output:
     x = file.readlines()
     file.seek(0)
     present = False
+    intial_label = "zxcjHkgafsd"
+    intial_label_no = 10000000000
     for line in file:
-        if(line == ''):
-            continue
-        line_no = line_no+1
+        line_no = line_no +1
         
         parts = line.split()
-        command = [parts[0]] + parts[1].replace(',', ' ').split(' ') 
+
+        if(parts[0][-1]==":"):
+            command = [parts[1]] + parts[2].replace(',', ' ').split(' ') 
+            intial_label_no = line_no
+            intial_label = parts[0][:-1]
+        else:    
+            command = [parts[0]] + parts[1].replace(',', ' ').split(' ') 
+
+
+        if(command[-1] == intial_label): 
+            output.write(midam_label_2(command, line_no, intial_label_no, intial_label) + '\n')
+            continue
         
-            
+        elif(command[-1] in label):
+            a = [command[0], command[1], command[2], str(line_no - label[command[-1]])]
+            funct3,opcode = B_Type[command[0]]
+            rs1,rs2 = Registers[command[1]], Registers[command[2]]
+        
+            y = twos_complement(int(line_no - label[command[-1]]),32)
+            x=y[::-1]
+
+
+            output.write( f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode} \n")
+            continue
+
+                
         if(command == ['beq','zero','zero','0']):
             present = True
-            output.write(savar_b(command,line_no) + '\n')
+            output.write(savar_b(command) + '\n')
             break
         if(command[0] in R_type):
             output.write(midam_r(command,line_no) + '\n')
@@ -264,13 +262,14 @@ with open(file_path, 'r') as file, open(output_path,'w') as output:
         elif(command[0] == 'sw'):
             output.write(savar_s(command,line_no) + '\n')
         elif(command[0] == 'lui' or command[0] == 'auipc'):
-            output.write(savar_u(command,line_no) + '\n')
+            output.write(savar_u(command) + '\n')
         elif(command[0] in B_Type):
-            output.write(savar_b(command, line_no) + '\n')
+            output.write(savar_b(command) + '\n')
+
         elif(command[0] == 'jal'):
-            output.write(savar_j(command, line_no) + '\n')
+            output.write(savar_j(command) + '\n')
         else:
-            output.write("Invalid input at line " + str(line_no) + '\n')
+            output.write("Invalid input at line " + str(line) + '\n')
         if(line_no == len(x)):
             if(command != ['beq','zero','zero','0']):
                 output.write("Virtual halt not present as last command" + '\n')
