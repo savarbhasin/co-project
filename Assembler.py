@@ -143,7 +143,7 @@ def midam_r(command, line_no):
         
         return f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
     except:
-        return "Incorrect syntax"
+        return  f"Incorrect syntax at {line_no}"
 
 def savar_i(command, line_no):
     try:
@@ -169,10 +169,10 @@ def savar_i(command, line_no):
         
 
         if(int(command[-1].split('(')[0]) != binary(x)):
-            return f"Overflow error"
+            return f"Overflow error at {line_no}"
         return f"{x}{rs1}{funct3}{rd}{opcode}"
     except:
-        return "Incorrect syntax"
+        return f"Incorrect syntax at {line_no}"
     
 def savar_s(command,line_no):
     try:
@@ -184,70 +184,79 @@ def savar_s(command,line_no):
         y = twos_complement(int(x[0]),12)
         x=y[::-1]
         if(binary(y) != int(command[-1].split('(')[0])):
-            return "Overflow error"
+            return f"Overflow error at {line_no}"
         return f"{x[5:][::-1]}{rs2}{rs1}010{x[:5][::-1]}0100011"
     except:
-        return "Incorrect syntax"
+        return f"Incorrect syntax {line_no}"
        
-def savar_b(command):
+def savar_b(command,line_no):
     try:
         funct3,opcode = B_Type[command[0]]
         rs1,rs2 = Registers[command[1]], Registers[command[2]]
         
-        y = twos_complement(int(command[-1]),32)
-        x=y[::-1]
+        if(command[-1] in Registers):
+            y = twos_complement(Registers[command[-1]])
+        else:
+            y = twos_complement(int(command[-1]),32)
+            x=y[::-1]
 
         if(int(command[-1])!=binary(y)):
-            return f"Overflow error"
+            return f"Overflow error at {line_no}"
 
         return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
     except:
-        return "Incorrect syntax"
+        return f"Incorrect syntax at {line_no}"
 
-def savar_u(command):
+def savar_u(command,line_no):
     try:
         y = twos_complement(int(command[-1]),32)
         rd = Registers[command[1]]
         x=y[::-1]
         if(int(command[-1])!=binary(y)):
-            return "Overflow error"
+            return f"Overflow error at {line_no}"
         if(command[0] == 'lui'):
             return f"{x[12:][::-1]}{rd}0110111"
         if(command[0] == 'auipc'):
             return f"{x[12:][::-1]}{rd}0010111"
     except:
-        return "Incorrect Syntax"
+        return f"Incorrect Syntax at {line_no}"
 
-def savar_j(command):
+def savar_j(command,line_no):
     try:
         rd = Registers[command[1]]
         y = twos_complement(int(command[-1]),21)
         x = y[::-1]
         if(int(command[-1])!=binary(y)):
-            return "Overflow error" 
+            return f"Overflow error at {line_no}" 
         return f"{x[20]}{x[1:11][::-1]}{x[11]}{x[12:20][::-1]}{rd}1101111"
     except:
-        return "Incorrect syntax"
+        return f"Incorrect syntax at {line_no}"
+
+
 
 
 file_path = sys.argv[1]
 output_path = sys.argv[2]
+
+
+
 with open(file_path, 'r') as file, open(output_path,'w') as output:
     line_no = 0
     x = file.readlines()
     file.seek(0)
     present = False
     for line in file:
-        line_no = line_no +1
+        if(line == ''):
+            continue
+        line_no = line_no+1
         
         parts = line.split()
         command = [parts[0]] + parts[1].replace(',', ' ').split(' ') 
         
-        
-                
+            
         if(command == ['beq','zero','zero','0']):
             present = True
-            output.write(savar_b(command) + '\n')
+            output.write(savar_b(command,line_no) + '\n')
             break
         if(command[0] in R_type):
             output.write(midam_r(command,line_no) + '\n')
@@ -256,11 +265,11 @@ with open(file_path, 'r') as file, open(output_path,'w') as output:
         elif(command[0] == 'sw'):
             output.write(savar_s(command,line_no) + '\n')
         elif(command[0] == 'lui' or command[0] == 'auipc'):
-            output.write(savar_u(command) + '\n')
+            output.write(savar_u(command,line_no) + '\n')
         elif(command[0] in B_Type):
-            output.write(savar_b(command) + '\n')
+            output.write(savar_b(command, line_no) + '\n')
         elif(command[0] == 'jal'):
-            output.write(savar_j(command) + '\n')
+            output.write(savar_j(command, line_no) + '\n')
         else:
             output.write("Invalid input at line " + str(line) + '\n')
         if(line_no == len(x)):
