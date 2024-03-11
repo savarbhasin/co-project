@@ -270,7 +270,7 @@ with open(file_path, 'r') as file, open(output_path,'w') as output:
         elif(command[0] == 'jal'):
             output.write(savar_j(command, line_no) + '\n')
         else:
-            output.write("Invalid input at line " + str(line) + '\n')
+            output.write("Invalid input at line " + str(line_no) + '\n')
         if(line_no == len(x)):
             if(command != ['beq','zero','zero','0']):
                 output.write("Virtual halt not present as last command" + '\n')
