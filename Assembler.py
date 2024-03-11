@@ -136,81 +136,98 @@ def binary(binary):
         return decimal
 
 def midam_r(command, line_no):
-
-    funct7,funct3,opcode = R_type[command[0]]
-    
-    rd, rs1, rs2 = Registers[command[1]], Registers[command[2]], Registers[command[3]]
-    
-    return f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
+    try:
+        funct7,funct3,opcode = R_type[command[0]]
+        
+        rd, rs1, rs2 = Registers[command[1]], Registers[command[2]], Registers[command[3]]
+        
+        return f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
+    except:
+        return "Incorrect syntax"
 
 def savar_i(command, line_no):
+    try:
+        funct3,opcode = I_Type[command[0]]
+        rd = Registers[command[1]]
     
-    funct3,opcode = I_Type[command[0]]
-    rd = Registers[command[1]]
-   
-    
-    
-    # convert imm to binary
+        
+        
+        # convert imm to binary
 
-    if(command[0] == 'lw'):
-        x=command[-1].split('(')
-        rs1 = Registers[command[-1].split('(')[1][:-1]]
-        x = twos_complement(int(x[0]),12)
-    
-    if(command[0] == 'addi' or command[0] == 'sltiu'):
-        x = twos_complement(int(command[-1]),12)
-        rs1 = Registers[command[2]]
+        if(command[0] == 'lw'):
+            x=command[-1].split('(')
+            rs1 = Registers[command[-1].split('(')[1][:-1]]
+            x = twos_complement(int(x[0]),12)
+        
+        if(command[0] == 'addi' or command[0] == 'sltiu'):
+            x = twos_complement(int(command[-1]),12)
+            rs1 = Registers[command[2]]
 
-    if(command[0] == 'jalr'):
-        x = twos_complement(int(command[-1]),12)
-        rs1 = '0110'
-    
+        if(command[0] == 'jalr'):
+            x = twos_complement(int(command[-1]),12)
+            rs1 = '0110'
+        
 
-    if(int(command[-1].split('(')[0]) != binary(x)):
-        return f"Overflow error"
-    return f"{x}{rs1}{funct3}{rd}{opcode}"
+        if(int(command[-1].split('(')[0]) != binary(x)):
+            return f"Overflow error"
+        return f"{x}{rs1}{funct3}{rd}{opcode}"
+    except:
+        return "Incorrect syntax"
     
 def savar_s(command,line_no):
-    x=command[-1].split('(')
-    
-    rs1 = Registers[command[-1].split('(')[1][:-1]]
-    rs2 = Registers[command[1]]
-    
-    x = twos_complement(int(x[0]),12)
-    x=x[::-1]
-
-    return f"{x[5:][::-1]}{rs2}{rs1}010{x[:5][::-1]}0100011"
+    try:
+        x=command[-1].split('(')
+        
+        rs1 = Registers[command[-1].split('(')[1][:-1]]
+        rs2 = Registers[command[1]]
+        
+        y = twos_complement(int(x[0]),12)
+        x=y[::-1]
+        if(binary(y) != int(command[-1].split('(')[0])):
+            return "Overflow error"
+        return f"{x[5:][::-1]}{rs2}{rs1}010{x[:5][::-1]}0100011"
+    except:
+        return "Incorrect syntax"
        
 def savar_b(command):
-    funct3,opcode = B_Type[command[0]]
-    rs1,rs2 = Registers[command[1]], Registers[command[2]]
-    
-    y = twos_complement(int(command[-1]),32)
-    x=y[::-1]
+    try:
+        funct3,opcode = B_Type[command[0]]
+        rs1,rs2 = Registers[command[1]], Registers[command[2]]
+        
+        y = twos_complement(int(command[-1]),32)
+        x=y[::-1]
 
-    if(int(command[-1])!=binary(y)):
-        return f"Overflow error"
+        if(int(command[-1])!=binary(y)):
+            return f"Overflow error"
 
-    return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
+        return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
+    except:
+        return "Incorrect syntax"
 
 def savar_u(command):
-    y = twos_complement(int(command[-1]),32)
-    rd = Registers[command[1]]
-    x=y[::-1]
-    if(int(command[-1])!=binary(y)):
-        return "Overflow error"
-    if(command[0] == 'lui'):
-        return f"{x[12:][::-1]}{rd}0110111"
-    if(command[0] == 'auipc'):
-        return f"{x[12:][::-1]}{rd}0010111"
+    try:
+        y = twos_complement(int(command[-1]),32)
+        rd = Registers[command[1]]
+        x=y[::-1]
+        if(int(command[-1])!=binary(y)):
+            return "Overflow error"
+        if(command[0] == 'lui'):
+            return f"{x[12:][::-1]}{rd}0110111"
+        if(command[0] == 'auipc'):
+            return f"{x[12:][::-1]}{rd}0010111"
+    except:
+        return "Incorrect Syntax"
 
 def savar_j(command):
-    rd = Registers[command[1]]
-    y = twos_complement(int(command[-1]),21)
-    x = y[::-1]
-    if(int(command[-1])!=binary(y)):
-        return "Overflow error" 
-    return f"{x[20]}{x[1:11][::-1]}{x[11]}{x[12:20][::-1]}{rd}1101111"
+    try:
+        rd = Registers[command[1]]
+        y = twos_complement(int(command[-1]),21)
+        x = y[::-1]
+        if(int(command[-1])!=binary(y)):
+            return "Overflow error" 
+        return f"{x[20]}{x[1:11][::-1]}{x[11]}{x[12:20][::-1]}{rd}1101111"
+    except:
+        return "Incorrect syntax"
 
 
 file_path = sys.argv[1]
