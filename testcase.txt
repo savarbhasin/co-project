@@ -1,0 +1,6 @@
+rvrs s1,s2
+addi s2,zero,16
+rst
+halt
+beq zero,zero,0
+sw s4,0(s1)
