@@ -324,7 +324,7 @@ with open(file_path, 'r') as f, open(output_path, 'w') as w:
         elif instruction[25:32] == '1100011':
             pc = savar_b(instruction, updated_register, pc)
         elif instruction[25:32] in ['0110111', '0111001', '0110111', '0111001']:
-            updated_register, pc = bonus(line, updated_register, pc)
+            updated_register, pc = bonus(instruction, updated_register, pc)
             pc = bin(int(pc, 2) + 4)[2:].zfill(32)
             
 
