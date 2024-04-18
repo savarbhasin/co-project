@@ -64,6 +64,12 @@ B_Type = {
     'bltu':['110','1100011'],
     'bgeu':['111','1100011']
 }
+BONUS_Type = {
+    'rst': ['0000000', '000', '0110111'],
+    'halt': ['0000000', '000', '0111001'],
+    'rvrs': ['0000001', '000', '0110111'],
+    'mul': ['0000001', '000', '0111001']
+}
 
 
 def twos_complement(number, bit_length):
@@ -198,10 +204,29 @@ def midam_label_2(command, line_no, intial_label_no, intial_label):
 
     return f"{x[12]}{x[5:11][::-1]}{rs2}{rs1}{funct3}{x[1:5][::-1]}{x[11]}{opcode}"
 
+
+
+def bonus(command, line_no):
+    try:
+        funct3, funct7, opcode = BONUS_Type[command[0]]
+        if command[0] == 'rst':
+            return f"{funct7}00000{opcode}"
+        elif command[0] == 'halt':
+            return f"{'0'*7}{'0'*5}{'0'*3}{'0'*5}{opcode}"
+        elif command[0] == 'rvrs':
+            rd, rs = Registers[command[1]], Registers[command[2]]
+            return f"{funct7}{rs}000{funct3}{rd}{opcode}"
+        elif command[0] == 'mul':
+            rd, rs1, rs2 = Registers[command[1]], Registers[command[2]], Registers[command[3]]
+            return f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
+        else:
+            return f"incorrect syntax at line {line_no}"
+    except KeyError:
+        return f"incorrect syntax at line {line_no}"
+
 file_path = sys.argv[1]
 output_path = sys.argv[2]
-# file_path = 'C:\\Users\\midam\\OneDrive\\Desktop\\VSC\\Sem2\\CO_Project\\input.txt'
-# output_path = 'C:\\Users\\midam\\OneDrive\\Desktop\\VSC\\Sem2\\CO_Project\\output.txt'
+
 
 with open(file_path, 'r') as file:
     line_no = 0
@@ -272,6 +297,8 @@ with open(file_path, 'r') as file, open(output_path,'w') as output:
 
         elif(command[0] == 'jal'):
             output.write(savar_j(command, line_no) + '\n')
+        elif(command[0] in ['mul','rvrs','halt','rst']:
+            output.write(bonus(command,line_no) + '\n)
         else:
             output.write("Invalid input at line " + str(line) + '\n')
         if(line_no == len(x)):
