@@ -51,13 +51,13 @@ BONUS_Type = {
 
 def reset_registers():
     updated_register = {register: '0'*32 for register in Registers.keys()}
-    updated_register['zero'] = '0'*32  # zero register remains unchanged
+    updated_register['zero'] = '0'*32  
     return updated_register
 def bonus(line, updated_register, pc):
     opcode = line[25:32]
     command = line[0:7]
     
-    if command == '0000000':  # rst or halt instruction
+    if command == '0000000':  
         if opcode == '0110111':  # rst instruction
             updated_register = reset_registers()
         elif opcode == '0111001':  # halt instruction
