@@ -1,4 +1,4 @@
 # co-project
 
-This is the repository for our co project.
+Bonus attempted, added to simulator and assembler.
 
