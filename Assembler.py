@@ -297,8 +297,8 @@ with open(file_path, 'r') as file, open(output_path,'w') as output:
 
         elif(command[0] == 'jal'):
             output.write(savar_j(command, line_no) + '\n')
-        elif(command[0] in ['mul','rvrs','halt','rst']:
-            output.write(bonus(command,line_no) + '\n)
+        elif(command[0] in ['mul','rvrs','halt','rst']):
+            output.write(bonus(command,line_no) + '\n')
         else:
             output.write("Invalid input at line " + str(line) + '\n')
         if(line_no == len(x)):
