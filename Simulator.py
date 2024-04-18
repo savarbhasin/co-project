@@ -1,6 +1,5 @@
 import sys
 
-# Registers dictionary
 Registers = {
     "zero": "00000", "ra": "00001", "sp": "00010", "gp": "00011", "tp": "00100",
     "t0": "00101", "t1": "00110", "t2": "00111", "s0": "01000", "s1": "01001",
@@ -11,17 +10,16 @@ Registers = {
     "t5": "11110", "t6": "11111"
 }
 
-# Initialize the register values
+
 updated_register = {i: '0'*32 for i in Registers.keys()}
 updated_register['sp'] = '0'*23 + '100000000'
 
-# Reverse the Registers dictionary
 Registers = {val:key for key,val in Registers.items()}
 
-# Data memory initialization
+
 data_memory = {hex(0x0001_0000 + i*4): '00000000000000000000000000000000' for i in range(32)}
 
-# R-Type Instructions
+
 R_type = {
     'add': ['0000000', '000', '0110011'], 'sub': ['0100000', '000', '0110011'],
     'sll': ['0000000', '001', '0110011'], 'slt': ['0000000', '010', '0110011'],
@@ -43,6 +41,38 @@ B_type = {
     'blt': ['100', '1100011'], 'bge': ['101', '1100011'],
     'bltu': ['110', '1100011'], 'bgeu': ['111', '1100011']
 }
+
+BONUS_Type = {
+    'rst': ['0000000', '000', '0110111'],
+    'halt': ['0000000', '000', '0111001'],
+    'rvrs': ['0000001', '000', '0110111'],
+    'mul': ['0000001', '000', '0111001']
+}
+
+def reset_registers():
+    updated_register = {register: '0'*32 for register in Registers.keys()}
+    updated_register['zero'] = '0'*32  # zero register remains unchanged
+    return updated_register
+def bonus(line, updated_register, pc):
+    opcode = line[25:32]
+    command = line[0:7]
+    
+    if command == '0000000':  # rst or halt instruction
+        if opcode == '0110111':  # rst instruction
+            updated_register = reset_registers()
+        elif opcode == '0111001':  # halt instruction
+            pc = '1'*32  
+            return updated_register, pc 
+    elif command == '0000001': 
+        if opcode == '0110111': 
+            rd, rs = Registers[line[20:25]], Registers[line[12:17]]
+            updated_register[rd] = updated_register[rs][::-1]
+        elif opcode == '0111001':  # mul instruction
+            rd, rs1, rs2 = Registers[line[20:25]], Registers[line[12:17]], Registers[line[7:12]]
+            updated_register[rd] = bin(int(updated_register[rs1], 2) * int(updated_register[rs2], 2))[2:].zfill(32)
+
+    return updated_register, pc
+
 
 def twos_complement(number, bit_length):
     if number >= 0:
@@ -293,6 +323,9 @@ with open(file_path, 'r') as f, open(output_path, 'w') as w:
             pc = bin(int(pc, 2) + 4)[2:].zfill(32)
         elif instruction[25:32] == '1100011':
             pc = savar_b(instruction, updated_register, pc)
+        elif instruction[25:32] in ['0110111', '0111001', '0110111', '0111001']:
+            updated_register, pc = bonus(line, updated_register, pc)
+            pc = bin(int(pc, 2) + 4)[2:].zfill(32)
             
 
         updated_register['zero'] = '0'*32
@@ -305,10 +338,6 @@ with open(file_path, 'r') as f, open(output_path, 'w') as w:
     for i in updated_register:
         w.write('0b' + updated_register[i] + ' ')
     w.write('\n')
-    # updated_register['zero'] = '0'*32
-    # for i in data_memory.keys():
-    #     w.write(i+':0b'+data_memory[i])
-    #     w.write('\n')
     for address, value in data_memory.items():
         w.write('0x'+format(int(address, 16), '08x') + ':0b' + value + '\n')
 
